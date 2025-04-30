@@ -13,7 +13,7 @@ import ceaser from "./assets/ceaser.png";
 import camera from "./assets/camera.png";
 import cream from "./assets/cream.png";
 import foot from "./assets/foot.png";
-import car from "./assets/car.png";
+import carImage from "./assets/car.png";
 
 const toArabicNumbers = (str) => {
   const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
@@ -232,7 +232,7 @@ const products = [
     discountAr: toArabicNumbers("0"),
     stars: 5,
     rating: 96,
-    image: car,
+    image: carImage,
     newProduct: "new",
     colors: "#FB1314",
   },
