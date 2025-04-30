@@ -1,21 +1,36 @@
 /* eslint-disable react/prop-types */
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Button, DropdownMenu } from "@radix-ui/themes";
+import { RiShoppingBag3Fill } from "react-icons/ri";
+import { MdOutlineCancel } from "react-icons/md";
 import "@radix-ui/themes/styles.css";
 import { SearchInput } from "./SearchInput";
+import { FaUserAlt } from "react-icons/fa";
 import heart from "@assets/heart.png";
-import cart from "@assets/cart.png";
+import cartImage from "@assets/cart.png";
 import clsx from "clsx";
 import { DataContext } from "../DataContext";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { CustomDropdown } from "./CustomDropdown";
-
+import { useAuth } from "../AuthContext";
+import { FaRegStar } from "react-icons/fa6";
+import { TbLogout2 } from "react-icons/tb";
 export function Header({ isRegister = false }) {
   const { language, handleLanguageChange } = useContext(DataContext);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("");
   const location = useLocation();
+  const { currentUser, logout, cart } = useAuth();
+  const navigate = useNavigate(); // Use useNavigate for redirection
+  // Logout handler
+  const handleLogout = () => {
+    logout(); // Call the logout function from useAuth
+    navigate("/"); // Redirect to the login page after logout
+  };
 
+  const handleCartClick = () => {
+    navigate("/cart");
+  };
   const navItems = useMemo(
     () => [
       {
@@ -40,27 +55,42 @@ export function Header({ isRegister = false }) {
         labelAr: "معلومات عنا",
       },
       {
-        name: "Register",
-        labelEn: "Register",
-        labelAr: "سجل الآن",
-        dropdown: true, // Specify this is a dropdown
-        options: [
-          {
-            name: "Sign Up",
-            path: "/signup",
-            labelEn: "Sign Up",
-            labelAr: "إنشاء حساب",
-          },
-          {
-            name: "Login",
-            path: "/login",
-            labelEn: "Login",
-            labelAr: "تسجيل الدخول",
-          },
-        ],
+        name: "Auth",
+        labelEn: currentUser ? "Account" : "Register",
+        labelAr: currentUser ? "الحساب" : "سجل الآن",
+        dropdown: true,
+        options: currentUser
+          ? [
+              {
+                name: "Profile",
+                path: "/profile",
+                labelEn: "Profile",
+                labelAr: "الملف الشخصي",
+              },
+              {
+                name: "Logout",
+                action: logout,
+                labelEn: "Logout",
+                labelAr: "تسجيل الخروج",
+              },
+            ]
+          : [
+              {
+                name: "Sign Up",
+                path: "/signup",
+                labelEn: "Sign Up",
+                labelAr: "إنشاء حساب",
+              },
+              {
+                name: "Login",
+                path: "/login",
+                labelEn: "Login",
+                labelAr: "تسجيل الدخول",
+              },
+            ],
       },
     ],
-    []
+    [currentUser, logout] // Add dependencies here
   );
   useEffect(() => {
     let currentNav = navItems.find((item) => item.path === location.pathname);
@@ -142,17 +172,32 @@ export function Header({ isRegister = false }) {
               <CustomDropdown
                 key={item.name}
                 triggerText={language === "en" ? item.labelEn : item.labelAr}
-                isActive={activeNav === "Register"} // Pass active state
+                isActive={activeNav === "Auth"}
               >
-                {item.options.map((option) => (
-                  <Link
-                    key={option.name}
-                    to={option.path}
-                    className="block p-2 transition duration-300 ease-in-out hover:text-[#F58A7B]"
-                  >
-                    {language === "en" ? option.labelEn : option.labelAr}
-                  </Link>
-                ))}
+                {item.options.map((option) =>
+                  option.path ? (
+                    <Link
+                      key={option.name}
+                      to={option.path}
+                      className="block p-2 transition duration-300 ease-in-out hover:text-[#F58A7B]"
+                    >
+                      {language === "en" ? option.labelEn : option.labelAr}
+                    </Link>
+                  ) : option.name === "Profile" ? (
+                    <Link key={option.name} to={option.path}>
+                      {" "}
+                      {language === "en" ? option.labelEn : option.labelAr}
+                    </Link>
+                  ) : (
+                    <button
+                      key={option.name}
+                      onClick={option.action}
+                      className="block w-full p-2 text-center transition duration-300 ease-in-out hover:text-[#F58A7B]"
+                    >
+                      {language === "en" ? option.labelEn : option.labelAr}
+                    </button>
+                  )
+                )}
               </CustomDropdown>
             ) : (
               <Link
@@ -180,17 +225,76 @@ export function Header({ isRegister = false }) {
             language={language}
           />
           {!isRegister && (
-            <div className="flex lg:gap-4 gap-3 items-center justify-center pl-2">
+            <div className="flex lg:gap-4 gap-3 items-center justify-center pl-2 cursor-pointer">
               <img
                 src={heart}
                 alt="Favourite image"
                 className="w-[17px] h-[17px] lg:w-[22px] lg:h-[22px] md:w-[17px] md:h-[17px]"
               />
-              <img
-                src={cart}
-                alt="Cart image"
-                className="w-[17px] h-[17px] lg:w-[25px] lg:h-[25px] md:w-[17px] md:h-[17px]"
-              />
+              <div className="relative" onClick={handleCartClick}>
+                <img
+                  src={cartImage}
+                  alt="Cart image"
+                  className="w-[17px] h-[17px] lg:w-[25px] lg:h-[25px] md:w-[17px] md:h-[17px]"
+                />
+                {cart && cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                    {cart.length}
+                  </span>
+                )}
+              </div>
+              {/* Conditionally render the user icon */}
+              {currentUser && (
+                <CustomDropdown
+                  triggerText={
+                    <div className="bg-Button rounded-full lg:w-[32px] lg:h-[32px] md:w-[26px] md:h-[26px] w-[22px] h-[22px] flex items-center justify-center">
+                      <FaUserAlt className="w-[10px] h-[10px] lg:w-[15px] lg:h-[15px] md:w-[12px] md:h-[12px] text-white" />
+                    </div>
+                  }
+                  isProfile={true}
+                >
+                  <div className="flex flex-col text-white gap-2 items-start justify-center font-normal">
+                    <div className="flex gap-2 text-white items-center justify-center">
+                      <FaUserAlt className="w-[15px] h-[15px] lg:w-[24px] lg:h-[24px] md:w-[20px] md:h-[20px] text-white" />
+                      <Link
+                        to="/profile"
+                        className="block p-2 transition duration-300 md:text-[14px] text-[12px] font-normal leading-[21px] ease-in-out hover:text-[#F58A7B]"
+                      >
+                        {language === "en"
+                          ? "Manage My Account"
+                          : " ادارة حسابي"}
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 text-white items-center justify-center">
+                      <RiShoppingBag3Fill className="w-[15px] h-[15px] lg:w-[24px] lg:h-[24px] md:w-[20px] md:h-[20px] text-white" />
+                      <Link className="block p-2 transition duration-300 md:text-[14px] text-[12px] font-normal leading-[21px] ease-in-out hover:text-[#F58A7B]">
+                        {language === "en" ? "My Orders" : "طلباتي"}
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 text-white items-center justify-center">
+                      <MdOutlineCancel className="w-[15px] h-[15px] lg:w-[24px] lg:h-[24px] md:w-[20px] md:h-[20px] text-white" />
+                      <Link className="block p-2 transition duration-300 md:text-[14px] text-[12px] font-normal leading-[21px] ease-in-out hover:text-[#F58A7B]">
+                        {language === "en" ? "My Cancellations" : "الإلغاءات"}
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 text-white items-center justify-center">
+                      <FaRegStar className="w-[15px] h-[15px] lg:w-[24px] lg:h-[24px] md:w-[20px] md:h-[20px] text-white" />
+                      <Link className="block p-2 transition duration-300 md:text-[14px] text-[12px] font-normal leading-[21px] ease-in-out hover:text-[#F58A7B]">
+                        {language === "en" ? "My Reviews" : "التقييمات"}
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 text-white items-center justify-center">
+                      <TbLogout2 className="w-[15px] h-[15px] lg:w-[24px] lg:h-[24px] md:w-[20px] md:h-[20px] text-white" />
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full p-2 text-center transition duration-300 ease-in-out hover:text-[#F58A7B] md:text-[14px] text-[12px] font-normal leading-[21px]"
+                      >
+                        {language === "en" ? "Logout" : "تسجيل الخروج"}
+                      </button>
+                    </div>
+                  </div>
+                </CustomDropdown>
+              )}
             </div>
           )}
         </div>

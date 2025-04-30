@@ -2,6 +2,8 @@
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import heart from "../assets/heart2.png";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
 
 // Convert Western numbers to Arabic numerals
 const toArabicNumerals = (num) => {
@@ -35,7 +37,10 @@ export const Card = ({ product, language, inOurProducts }) => {
     newProduct,
     colors,
   } = product;
-
+  const { addToCart } = useContext(AuthContext);
+  const handleAddToCart = () => {
+    addToCart(product);
+  };
   // Choose correct language values
   const displayName = language === "ar" ? nameAr : name;
   const displayCurrentPrice =
@@ -83,7 +88,10 @@ export const Card = ({ product, language, inOurProducts }) => {
         </div>
         {/* "Add to Cart" button */}
         <div className="absolute bottom-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button className="bg-black text-white py-2 rounded-[4px] w-full">
+          <button
+            onClick={handleAddToCart}
+            className="bg-black text-white py-2 rounded-[4px] w-full"
+          >
             {language === "ar" ? "أضف إلى السلة" : "Add to Cart"}
           </button>
         </div>

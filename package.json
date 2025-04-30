@@ -5,14 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.8.2",
     "@radix-ui/themes": "^3.1.6",
     "clsx": "^2.1.1",
-    "firebase": "^11.3.1",
+    "firebase": "^11.4.0",
     "flowbite-react": "^0.10.2",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.7",

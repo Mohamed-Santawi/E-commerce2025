@@ -75,27 +75,8 @@ export function SaleCounter() {
     (product) =>
       !(selectedProductIds.includes(product.id) && "newProduct" in product)
   );
-  // const nextSlide = () => {
-  //   setCurrentSlide((prev) => {
-  //     if (language === "ar") {
-  //       return prev - productsPerSlide >= 0 ? prev - productsPerSlide : 0;
-  //     }
-  //     return prev + productsPerSlide < products.length
-  //       ? prev + productsPerSlide
-  //       : products.length - productsPerSlide;
-  //   });
-  // };
 
-  // const prevSlide = () => {
-  //   setCurrentSlide((prev) => {
-  //     if (language === "ar") {
-  //       return prev + productsPerSlide < products.length
-  //         ? prev + productsPerSlide
-  //         : products.length - productsPerSlide;
-  //     }
-  //     return prev - productsPerSlide >= 0 ? prev - productsPerSlide : 0;
-  //   });
-  // };
+
 
   const nextSlide = () => {
     if (filteredProducts.length === 0) return; // Add check for empty array

@@ -17,3 +17,6 @@ export * from "./Services";
 export * from "./Footer";
 export * from "./ScrollToTopButton ";
 export * from "./CustomDropdown";
+export * from "./PaymentOptions";
+export * from "./AddressBook";
+export * from "./MyProfile";
